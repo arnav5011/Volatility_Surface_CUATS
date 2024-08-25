@@ -113,7 +113,7 @@ def lin_inter(valid_options):
     plt.show()
 
 def cubic_inter(valid_options):
-    """Perform Cubit Interpolation"""
+    """Perform Cubic Interpolation"""
 
     valid_options.sort_values(by=["strike", "DTE"], inplace=True)
     plotted_options = valid_options.tail(-1)
@@ -122,33 +122,30 @@ def cubic_inter(valid_options):
         list(zip(plotted_options["strike"], plotted_options["DTE"])), 
         plotted_options["IV"]
     )
-    
 
+    # Create a grid for the surface plot
     strike_vec = np.linspace(min(plotted_options["strike"]), max(plotted_options["strike"]))
     DTE_vec = np.linspace(min(plotted_options["DTE"]), max(plotted_options["DTE"]))
-    X, Y = np.meshgrid(strike_vec, DTE_vec)
-    
-    IV_vals = cubic_interpolator(X, Y)
-    
-    X_flat = X.flatten()
-    Y_flat = Y.flatten()
-    IV_vals_flat = IV_vals.flatten()
+    Y, X = np.meshgrid(DTE_vec, strike_vec)
     
 
+    IV_vals = cubic_interpolator(X, Y)
+
+    # Plotting the surface plot
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    
 
-    scatter = ax.scatter(X_flat, Y_flat, IV_vals_flat, c=-IV_vals_flat, cmap='RdBu', marker='o')
-    
+    # Create the surface plot
+    surface = ax.plot_surface(X, Y, IV_vals, cmap='RdBu', edgecolor='none')
 
-    fig.colorbar(scatter, ax=ax, label='Implied Volatility (IV)')
+    # Add a color bar
+    fig.colorbar(surface, ax=ax, label='Implied Volatility (IV)')
     
     # Set axis labels and title
     ax.set_xlabel('Strike')
     ax.set_ylabel('DTE')
     ax.set_zlabel('Implied Volatility')
-    ax.set_title('3D Scatter Plot of Interpolated IV Values')
+    ax.set_title('3D Surface Plot of Interpolated IV Values')
 
     # Display the plot
     plt.show()
